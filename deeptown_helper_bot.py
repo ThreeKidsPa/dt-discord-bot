@@ -3,11 +3,12 @@ from discord.ext import commands
 import random
 import logging
 
+import guildevent
+
 logging.basicConfig(level=logging.INFO)
 
-description = '''An example bot to showcase the discord.ext.commands extension
-module.
-There are a number of utility commands being showcased here.'''
+description = '''I'm a bot to make it easy for you to keep track of your guild event donations.
+There are a number things you can do.'''
 bot = commands.Bot(command_prefix='!', description=description)
 
 @bot.event
@@ -17,77 +18,43 @@ async def on_ready():
     print(bot.user.id)
     print('------')
 
-@bot.command(description = 'For donating materials in support of a guild event')
-async def donate():
+@bot.group(pass_context=True)
+async def guildEvent(ctx):
+    """Commands for managing guild events"""
+    if ctx.invoked_subcommand is None:
+        await bot.say("you need to give me a sub command!")
+
+@guildEvent.command(name='start', pass_context=True)
+async def _start(ctx):
+    """Start a new guild event, removing the old one and any data with it"""
+    await bot.say("starting an event")
+
+@guildEvent.command(name='donations', pass_context=True)
+async def _donations(ctx):
+    """Display a donation summary report"""
+    await bot.say("preparing guild event summary report")
+
+@guildEvent.command(name='info', pass_context=True)
+async def _info(ctx):
+    """Display current event information"""
+    await bot.say("displaying information for current guild event")
+
+@guildEvent.command(name='complete', pass_context=True)
+async def _complete(ctx):
+    """Mark an event as finished"""
+    await bot.say("marking an event as over")
+
+@bot.group(description = 'commands for donating materials in support of a guild event', pass_context=True)
+async def donate(ctx, material : str, amount : int):
     """Donate materials to a guild event"""
     await bot.say("I'm dealing with a donation command")
 
-@bot.command(description = 'Manages the current guild event')
-async def guildEvent(subcmd : str)
-    """Use this command to establish a new guild event, or get information about the current event"""
-    await bot.say("Processing a guildEvent request")
+@donate.command(name='show', pass_context=True)
+async def _show(ctx, menber : discord.Member):
+    await bot.say("Showing donation details for member")
 
-@bot.command()
-async def showDonations()
-    """Command to show donations for the current event"""
-    await bot.say("show current donations")
-
-@bot.command()
-async def retractDonation()
-    """Command to retract a donation submitted in error"""
-    await bot.say("retracting a donation")
-
-@bot.command()
-async def showEventSummary()
-    """Summarize total contributions by each member for a guild event"""
-    await bot.say("guild event summary")
-
-
-
-@bot.command()
-async def add(left : int, right : int):
-    """Adds two numbers together."""
-    await bot.say(left + right)
-
-@bot.command()
-async def roll(dice : str):
-    """Rolls a dice in NdN format."""
-    try:
-        rolls, limit = map(int, dice.split('d'))
-    except Exception:
-        await bot.say('Format has to be in NdN!')
-        return
-
-    result = ', '.join(str(random.randint(1, limit)) for r in range(rolls))
-    await bot.say(result)
-
-@bot.command(description='For when you wanna settle the score some other way')
-async def choose(*choices : str):
-    """Chooses between multiple choices."""
-    await bot.say(random.choice(choices))
-
-@bot.command()
-async def repeat(times : int, content='repeating...'):
-    """Repeats a message multiple times."""
-    for i in range(times):
-        await bot.say(content)
-
-@bot.command()
-async def joined(member : discord.Member):
-    """Says when a member joined."""
-    await bot.say('{0.name} joined in {0.joined_at}'.format(member))
-
-@bot.group(pass_context=True)
-async def cool(ctx):
-    """Says if a user is cool.
-    In reality this just checks if a subcommand is being invoked.
-    """
-    if ctx.invoked_subcommand is None:
-        await bot.say('No, {0.subcommand_passed} is not cool'.format(ctx))
-
-@cool.command(name='bot')
-async def _bot():
-    """Is the bot cool?"""
-    await bot.say('Yes, the bot is cool.')
+@donate.command(name='remove', pass_cotext=True)
+async def _remove(ctx, donationId : int):
+    await bot.say("removing donation id")
 
 bot.run('NDA5Mzg3NzA1Mjg2MzkzODU2.DVd8Xg.x8ysZuFad6myhPHbd1fU3YbHUeA')
